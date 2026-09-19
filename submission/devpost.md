@@ -45,6 +45,18 @@ about to tell, and in the third cohort it sits on the null instead.
 That script is in the repository. It is the most useful thing I wrote, and all it does is take
 something away.
 
+## The one-page summary
+
+The rules ask for a one-page PDF alongside this write-up, and Devpost's form takes images but
+not documents, so it lives in the repository:
+
+**https://github.com/Ketchio-dev/last-one-standing/blob/main/submission/onepager.pdf**
+
+It is one page, built from `submission/onepager.html` by the command in the checklist, and it
+carries the count, the null that deleted our first headline, the model, and the finished versus
+planned section. Nothing on it is typed by hand; the figures come from the same script output
+the checks verify.
+
 ## What it does
 
 It answers one question about Canada's drug supply with counting, and then it shows its own
