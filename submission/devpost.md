@@ -1,35 +1,48 @@
 # Devpost body — Last One Standing
 
-> **읽는 사람에게 (제출 전에 지워라).**
->
-> **Inspiration 은 비어 있다.** 아래 절에 물음을 남겼다. 답이 곧 문단이다. 지어내지 않았다.
->
-> 본문의 모든 수치는 `src/check.py` 가 `report.py` · `model.py` · `null.py` 출력과 대조해
-> 통과시킨 것이다 (**25/25**). 손으로 고치면 검사가 먼저 빨개진다.
->
-> tagline 은 셋을 뒀다. 하나 고르고 나머지는 지워라.
 
----
+## Tagline
 
-## Tagline (택 1)
+> **407 molecules used to have competition and now have one company. That is measured, not modelled.**
 
-- **A.** 1,203 of Canada's marketed molecules have exactly one supplier. The regulator already publishes that. Here is what it does not.
-- **B.** The gradient that looks like a finding is arithmetic. We printed the null that took it from us.
-- **C.** 407 molecules used to have competition and now have one company. That is measured, not modelled.
+The 58.9 % headline belongs to the regulator and to two published papers. This number does not,
+and the second sentence is the part the judging asks about. Two others were drafted:
 
----
+- *1,203 of Canada's marketed molecules have exactly one supplier. The regulator already
+  publishes that. Here is what it does not.* Honest, but spends the tile on someone else's number.
+- *The gradient that looks like a finding is arithmetic. We printed the null that took it from
+  us.* The most interesting sentence in the project and the worst tile: it never says what the
+  project is.
+
 
 ## Inspiration
 
-*(사람이 쓴다.)*
+Nobody in my family has ever gone without a medicine because it ran out. I have no story here,
+and I would rather say so than borrow one. This started because Health Canada publishes its
+whole drug database as a download with no key and no account, and I wanted to see what was in it.
 
-세 가지만 답하면 문단이 된다:
+The first thing I found was that my idea was not mine. I counted how many marketed molecules
+have exactly one company behind them, got 1,203 of 2,044, and then found that the regulator's
+own economists had published essentially the same figure years earlier with a thirteen-year
+series behind it. That was the right time to stop and ask what was actually left.
 
-1. 약이 **품절이라 못 받은 적**이 있는가? 본인이든 가족이든. 있었다면 무슨 약이었고
-   어떻게 됐나.
-2. 없다면 — 캐나다 의약품 공급을 왜 들여다보게 됐나. 수업이었나, 기사였나, 누가 말했나.
-3. 이 프로젝트에서 **가장 놀랐던 순간**은 어디였나. (후보: 헤드라인으로 삼으려던 기울기가
-   순전히 산술이었다는 걸 알았을 때.)
+What was left turned out to be a question the snapshot cannot answer. A molecule with one
+supplier today might have had one all along, or it might have had six. Those are different
+situations wearing the same number. Health Canada keeps every product it has ever authorised,
+including the discontinued ones, so the history is sitting right there. Reconstructing it gave
+407 molecules that used to have competition and now have one company. That count is measured
+rather than modelled, and no null hypothesis takes it away.
+
+The part I did not plan was watching my best-looking result die. Molecules with more suppliers
+disappear less often, and the gradient is clean across three cohorts. It held up so well that I
+wrote the headline before I checked it. Then I worked out what the gradient would look like if
+suppliers simply left at random and independently, which turns the whole thing into p to the
+power of k and produces the same shape with no signal in it at all. Measuring that rate from the
+cohort itself, eight cells sit above the null and six below, and the single-supplier cell is
+consistently better than the null predicts. The opposite of the story I was about to tell.
+
+That script is in the repository. It is the most useful thing I wrote, and all it does is take
+something away.
 
 ## What it does
 
