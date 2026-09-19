@@ -38,8 +38,9 @@ disappear less often, and the gradient is clean across three cohorts. It held up
 wrote the headline before I checked it. Then I worked out what the gradient would look like if
 suppliers simply left at random and independently, which turns the whole thing into p to the
 power of k and produces the same shape with no signal in it at all. Measuring that rate from the
-cohort itself, eight cells sit above the null and six below, and the single-supplier cell is
-consistently better than the null predicts. The opposite of the story I was about to tell.
+cohort itself, eight cells sit above the null and six below, and in two of the three cohorts the
+single-supplier cell lands well under what the null predicts. The opposite of the story I was
+about to tell, and in the third cohort it sits on the null instead.
 
 That script is in the repository. It is the most useful thing I wrote, and all it does is take
 something away.
