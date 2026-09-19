@@ -38,6 +38,7 @@ NAMES = [
     "모델 특징이 코호트 연도 이후 정보를 쓰지 않는다",
     "README 가 말하는 검사·사보타주 개수가 실제와 같다",
     "제출물(devpost·1쪽 PDF)의 수치가 출력과 일치한다",
+    "어느 문서도 검사·사보타주 개수를 틀리게 적지 않았다",
 ]
 result = {n: (False, "실행되지 않음") for n in NAMES}
 assert len(NAMES) == len(set(NAMES)), "검사 이름이 중복된다"
@@ -360,6 +361,40 @@ for _label, _po, _pdev, _pone in _FACTS:
 if _seen < len(_FACTS) * 2 and not _sb:
     _sb.append(f"확인한 자리가 {_seen}개뿐이다 (기대 {len(_FACTS)*2})")
 ok(NAME("제출물(devpost·1쪽 PDF)의 수치가 출력과 일치한다"), not _sb, "; ".join(sorted(set(_sb))[:4]))
+
+# **README 만 묶으면 나머지가 샌다.** 제출 본문·AI 고지·체크리스트가 전부 옛 수를 들고 있었고,
+# 심사위원이 읽는 건 그쪽이다. 개수를 적은 문서를 **전부** 훑어 코드와 대조한다.
+import glob as _g9
+_cnt_bad = []
+_docs9 = ([os.path.join(ROOT, f) for f in ("README.md", "VERIFICATION.md")]
+          + sorted(_g9.glob(os.path.join(ROOT, "submission", "*.md")))
+          + sorted(_g9.glob(os.path.join(ROOT, "submission", "*.html"))))
+_N_CHK, _N_SAB = len(NAMES), n_sabs
+_pats9 = [
+    (r"(\d+)\s*checks?,? (?:at a|whose|on the|run on)", _N_CHK, "검사"),
+    (r"check\.py[^\n]*?#\s*(\d+)\s*checks", _N_CHK, "검사"),
+    (r"check\.py[^\n]*?(\d+)\s*checks", _N_CHK, "검사"),
+    (r"`check\.py` \((\d+) checks\)", _N_CHK, "검사"),
+    (r"→ \*\*(\d+)/\d+\*\*", _N_CHK, "검사"),
+    (r"(\d+) checks at a fixed denominator", _N_CHK, "검사"),
+    (r"(\d+)\s*(?:planted|deliberate) defects", _N_SAB, "사보타주"),
+    (r"breaks? (\d+) things", _N_SAB, "사보타주"),
+    (r"break (\d+) things", _N_SAB, "사보타주"),
+    (r"Current: (\d+) of \d+ caught", _N_SAB, "사보타주"),
+    (r"\*\*(\d+)/\d+ 검출", _N_SAB, "사보타주"),
+]
+for _f9 in _docs9:
+    if not os.path.exists(_f9):
+        continue
+    _t9 = open(_f9, encoding="utf-8").read()
+    for _p9, _w9, _k9 in _pats9:
+        if _w9 is None:
+            continue
+        for _m9 in re.finditer(_p9, _t9):
+            if int(_m9.group(1)) != _w9:
+                _cnt_bad.append(f"{os.path.basename(_f9)}: {_k9} {_m9.group(1)} (실제 {_w9})")
+_cnt_bad = sorted(set(_cnt_bad))
+ok(NAME("어느 문서도 검사·사보타주 개수를 틀리게 적지 않았다"), not _cnt_bad, "; ".join(_cnt_bad[:4]))
 
 print()
 failed = 0

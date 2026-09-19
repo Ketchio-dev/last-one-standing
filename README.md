@@ -25,9 +25,10 @@ rate falls as *p^k* with no signal at all. Measuring *p* from the cohort itself 
 | 5 | 84 | 9.5 % | 2.7 % | **+6.8 pp** |
 | 6+ | 295 | 3.4 % | 1.3 % | **+2.1 pp** |
 
-8 cells sit above that null and 6 below — **not one direction.** The
-single-supplier cell is consistently *better* than the null, which is the opposite of the
-story the raw gradient tells. So "supplier count predicts disappearance" is not a finding we
+Counting cells that miss the null by more than a point, across all three cohorts, 8 sit above
+it and 6 below — **not one direction.** In 2011 and 2016 the single-supplier cell is well
+*better* than the null (-12.4 and -10.8 pp), which is the opposite of the story the raw gradient
+tells; in 2006 it sits on the null (+0.6 pp). So the effect is not consistent either. So "supplier count predicts disappearance" is not a finding we
 claim. `src/null.py` is the script that took it away from us.
 
 **3. What is left is the thinning itself, which is a count and not a prediction.**
@@ -89,7 +90,8 @@ That is better by **+0.071 AUC**. Two honest limits on that number:
 - **Disappearing is usually obsolescence, not crisis.** We do not check whether a same-class
   survivor exists.
 - **`company_name` is the market authorisation holder, not the plant.** Subsidiaries count as
-  separate suppliers. Merging parents can only *raise* the single-supplier count, so
+  separate suppliers. Merging parents can only *raise* the single-supplier count, never lower it,
+  and with the approximation the page ships it raises it by **zero**, so
   **1,203 is the conservative direction** — a rare case where the unfixed weakness
   strengthens rather than threatens the claim.
 - **Product lifespans are approximate.** Health Canada's status endpoint carries one row per
@@ -102,8 +104,8 @@ python3 src/fetch_data.py     # ~50 MB, no key, no account
 python3 src/build.py          # join -> data/molecules.json
 python3 src/report.py         # every number quoted above
 python3 src/export_web.py     # web/index.html, opens from the filesystem, no server
-python3 src/check.py          # 26 checks, at a denominator that cannot shrink
-python3 src/sabotage.py       # break 27 things on purpose; do the checks notice?
+python3 src/check.py          # 27 checks, at a denominator that cannot shrink
+python3 src/sabotage.py       # break 28 things on purpose; do the checks notice?
 ```
 
 **A passing count is not a quality signal.** The first version of the check suite reported

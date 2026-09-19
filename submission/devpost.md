@@ -86,9 +86,10 @@ rate *p*, the disappearance rate falls as *p^k* with no signal at all. Measuring
 | 5 | 84 | 9.5 % | 2.7 % | **+6.8 pp** |
 | 6+ | 295 | 3.4 % | 1.3 % | **+2.1 pp** |
 
-8 cells sit above that null and 6 below. Not one direction. The single-supplier cell is
-consistently **better** than the null, which is the opposite of the story the raw gradient
-tells. `src/null.py` is the script that took our headline away, and it ships in the repo.
+Counting cells that miss the null by more than a point, across all three cohorts, 8 sit above it
+and 6 below. Not one direction. In 2011 and 2016 the single-supplier cell lands well **better**
+than the null, which is the opposite of the story the raw gradient tells; in 2006 it sits on the
+null. So it is not consistent either. `src/null.py` is the script that took our headline away, and it ships in the repo.
 
 **The interface.** Click a molecule and you get its 1996-2026 supplier band and the cohort row
 it belongs to. The page opens from the filesystem. No server, no account, no key.
@@ -100,7 +101,8 @@ report **52 %** of off-patent drugs in a monopoly market in 2022, with a thirtee
 Zhang et al. (*CMAJ Open*, 2020) reach about 51 % from the same public database. Our 58.9 %
 differs because we count active-ingredient sets rather than their unit, and because
 `company_name` is the market authorisation holder, not the plant, so subsidiaries count
-separately. Merging parents could only **lower** it. We say this on the page.
+separately. Merging them can only **raise** the single-supplier count, never lower it, and with
+the approximation the page ships it raises it by **zero**. We say this on the page.
 
 ## Does anything beat counting?
 
@@ -122,8 +124,9 @@ and tested on later ones, with features restricted to what was knowable in the c
 | `lost_already` | **+0.813** |
 | `age_years` | +0.164 |
 
-`lost_already` — companies a molecule has **already** shed — outweighs how many it has now.
-Thinning predicts disappearing better than thinness does.
+`lost_already` — companies a molecule has **already** shed — is the only feature that pushes
+*toward* disappearing, and it comes within a tenth of `holders` (0.813 against 0.908) while
+measuring something the supplier count cannot see. Thinning carries nearly as much as thinness.
 
 ## What is finished versus planned
 
@@ -131,8 +134,8 @@ The judging criteria ask this directly, so here it is without softening.
 
 **Finished and verified:**
 - The full pipeline: fetch, join, report, model, null, web export. Runs from a clean clone.
-- 25 checks at a fixed denominator, and 25 planted defects that prove the checks can fail
-  (25 of 25 caught, 0 missed).
+- 27 checks at a fixed denominator, and 28 planted defects that prove the checks can fail
+  (27 of 27 caught, 0 missed).
 - Every figure quoted here is re-derived from the data by a check, not typed by hand.
 
 **Not done:**
@@ -173,8 +176,8 @@ src/report.py       every number quoted above
 src/model.py        logistic regression, pure Python
 src/null.py         the arithmetic null that killed our headline
 src/export_web.py   web/index.html, opens from the filesystem
-src/check.py        25 checks, at a denominator that cannot shrink
-src/sabotage.py     break 25 things on purpose; do the checks notice?
+src/check.py        27 checks, at a denominator that cannot shrink
+src/sabotage.py     break 28 things on purpose; do the checks notice?
 ```
 
 ## What I learned

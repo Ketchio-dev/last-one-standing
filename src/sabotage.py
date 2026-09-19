@@ -126,6 +126,9 @@ SABS = [
     ("1쪽 PDF 원본의 수치를 슬쩍 고친다", "submission/onepager.html",
      r"re:<td class=\"big\">407</td>", '<td class="big">470</td>',
      "제출물(devpost·1쪽 PDF)의 수치가 출력과 일치한다"),
+    ("AI 고지의 검사 개수를 옛 값으로 되돌린다", "submission/devpost.md",
+     r"re:\d+ checks at a fixed denominator", "25 checks at a fixed denominator",
+     "어느 문서도 검사·사보타주 개수를"),
 ]
 
 # **복원 목록을 손으로 관리하지 않는다.** 겨냥 대상에서 유도한다 —

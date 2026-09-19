@@ -11,8 +11,8 @@ Design & Usability · Presentation.
 
 - [ ] 새 폴더에 클론해서 `python3 src/build.py && python3 src/report.py &&
       python3 src/export_web.py` 가 그대로 돈다 (데이터가 커밋돼 있어야 한다)
-- [ ] `python3 src/check.py` → **25/25**
-- [ ] `python3 src/sabotage.py` → **25/25 검출, 놓침 0**
+- [ ] `python3 src/check.py` → **27/27**
+- [ ] `python3 src/sabotage.py` → **28/28 검출, 놓침 0**
 - [ ] `web/index.html` 을 **더블클릭**해서 열린다 (서버 없이)
 - [ ] **분자를 눌러 보면 1996→2026 공급자 밴드가 뜬다** — "user interaction 있는 프로토타입"
       요건이 이것이다. 안 되면 규정 미충족이다
