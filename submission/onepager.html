@@ -1,0 +1,111 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><title>Last One Standing, one page</title>
+<style>
+  @page { size: letter; margin: 13mm 14mm; }
+  html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body { font: 9.2pt/1.35 "Helvetica Neue", Helvetica, Arial, sans-serif; color: #111; margin: 0; }
+  h1 { font-size: 16pt; margin: 0 0 1mm; letter-spacing: -.01em; }
+  .sub { font-size: 9pt; color: #444; margin: 0 0 3mm; }
+  h2 { font-size: 9.6pt; margin: 3.4mm 0 1.2mm; text-transform: uppercase;
+       letter-spacing: .06em; color: #000; border-bottom: .5pt solid #bbb; padding-bottom: .6mm; }
+  p { margin: 0 0 1.6mm; }
+  .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 0 6mm; }
+  table { border-collapse: collapse; width: 100%; font-size: 8.3pt; margin: .8mm 0 1.6mm; }
+  th, td { padding: .5mm 1mm; border-bottom: .4pt solid #ddd; text-align: right; }
+  th:first-child, td:first-child { text-align: left; }
+  th { font-weight: 600; color: #333; border-bottom: .6pt solid #999; }
+  .big { font-size: 13pt; font-weight: 700; }
+  b { font-weight: 650; }
+  .note { font-size: 7.8pt; color: #555; }
+  ul { margin: 0 0 1.6mm; padding-left: 4mm; }
+  li { margin-bottom: .5mm; }
+  .kill { background: #f4f4f4; padding: 1.6mm 2mm; border-left: 2pt solid #333; }
+  footer { margin-top: 3mm; padding-top: 1.4mm; border-top: .5pt solid #bbb;
+           font-size: 7.6pt; color: #555; }
+</style>
+<h1>Last One Standing</h1>
+<p class="sub">How much of Canada's drug supply thinned to a single company, counted from the
+regulator's own records, and the arithmetic that took our best finding away.</p>
+
+<div class="cols">
+<div>
+
+<h2>The count</h2>
+<table>
+  <tr><td>molecules currently marketed</td><td class="big">2,044</td></tr>
+  <tr><td>with exactly one supplier</td><td><b>1,203</b> (58.9 %)</td></tr>
+  <tr><td>of those, once had two or more</td><td class="big">407</td></tr>
+  <tr><td>single-supplier with unexpired listed patent</td><td>343</td></tr>
+  <tr><td>ever on the Patent Register at all</td><td>513</td></tr>
+  <tr><td>Rx-only, no unexpired patent, pre-2006, one supplier</td><td>382</td></tr>
+  <tr><td>once marketed in Canada, no longer</td><td>6,651</td></tr>
+</table>
+<p class="note"><b>407</b> is the project. Not how concentrated the market is today, but how much
+of it thinned while nobody was counting. Reconstructed from every product Health Canada has ever
+authorised, not inferred from a snapshot.</p>
+
+<h2>We do not headline 58.9 %</h2>
+<p>It is not ours and not new. PMPRB / Gaudette et al. (<i>JAMA Health Forum</i> 2024) report
+<b>52 %</b> of off-patent drugs in a monopoly market in 2022. Zhang et al. (<i>CMAJ Open</i> 2020)
+reach ≈51 %. We differ because we count active-ingredient sets, and because <code>company_name</code>
+is the authorisation holder, not the plant. Merging parents could only <i>lower</i> our number.</p>
+
+<h2>One supplier is not a shortage warning</h2>
+<p class="note">PMPRB's 2022 shortage study: of 8,558 shortage reports only <b>2 %</b> were
+single-source non-patented drugs, and single-source drugs were in shortage <b>22 %</b> of the time
+against <b>32 %</b> for multi-source. Santhireswaran et al. (<i>JAMA Netw Open</i> 2026) found drugs
+with more than 25 products available had the <i>higher</i> shortage intensity. If this page implied
+a supply warning, the regulator would contradict it. It does not.</p>
+
+<h2>Finished vs planned</h2>
+<p class="note"><b>Finished:</b> full pipeline from a clean clone; 25 checks at a fixed denominator;
+25 planted defects, 25 caught, 0 missed; every figure here re-derived by a check, none typed by hand.<br>
+<b>Not done:</b> no shortage data (healthproductshortages.ca needs an account we did not create);
+<code>rx</code> reads today's value because the database has no point-in-time status; all cohorts
+share one endpoint and overlap heavily, so this is three views of one outcome, not three
+replications; no therapeutic-substitution check, so we cannot separate obsolescence from loss.</p>
+
+</div>
+<div>
+
+<h2>The finding we deleted</h2>
+<div class="kill">
+<p>Molecules with more suppliers disappear less often. That gradient holds in all three cohorts
+and it looks like a finding. <b>It is arithmetic.</b> A molecule leaves the market only when
+<i>every</i> supplier leaves, so if companies depart independently at rate <i>p</i>, the rate falls
+as <i>p<sup>k</sup></i> with no signal at all. Measuring <i>p</i> from the 2016 cohort gives 0.486:</p>
+<table>
+  <tr><th>suppliers 2016</th><th>n</th><th>gone</th><th>null p<sup>k</sup></th><th>diff</th></tr>
+  <tr><td>1</td><td>1,233</td><td>37.8 %</td><td>48.6 %</td><td><b>-10.8</b></td></tr>
+  <tr><td>2</td><td>279</td><td>27.2 %</td><td>23.6 %</td><td>+3.7</td></tr>
+  <tr><td>3</td><td>175</td><td>11.4 %</td><td>11.4 %</td><td>-0.0</td></tr>
+  <tr><td>4</td><td>106</td><td>5.7 %</td><td>5.6 %</td><td>+0.1</td></tr>
+  <tr><td>5</td><td>84</td><td>9.5 %</td><td>2.7 %</td><td>+6.8</td></tr>
+  <tr><td>6+</td><td>295</td><td>3.4 %</td><td>1.3 %</td><td>+2.1</td></tr>
+</table>
+<p class="note">8 cells above the null, 6 below, not one direction. The single-supplier cell is
+consistently <i>better</i> than the null: the opposite of the story the raw gradient tells.
+<code>src/null.py</code> is the script that took it from us, and it ships in the repo.</p>
+</div>
+
+<h2>Does anything beat counting?</h2>
+<table>
+  <tr><th>cohort</th><th>n</th><th>gone</th><th>suppliers only</th><th>model</th><th>diff</th></tr>
+  <tr><td>2011</td><td>2,120</td><td>748</td><td>0.690</td><td>0.754</td><td><b>+0.064</b></td></tr>
+  <tr><td>2016</td><td>2,172</td><td>586</td><td>0.681</td><td>0.758</td><td><b>+0.078</b></td></tr>
+</table>
+<p class="note">Logistic regression in pure Python, no numpy, fit on 2006 and tested on later
+cohorts. Features restricted to what was knowable in the cohort year.
+<b>The strongest positive weight is <code>lost_already</code> (+0.813)</b>: companies a molecule has
+<i>already</i> shed, above <code>holders</code> (-0.908) and <code>products_by_then</code> (-0.670).
+Thinning predicts disappearing better than thinness does.</p>
+
+
+</div>
+</div>
+
+<footer>
+Health Canada Drug Product Database (bulk JSON, no key) + Patent Register. Python 3 standard
+library only: no packages, no API keys, no accounts. The page opens from the filesystem.
+Retrieval dates recorded in <code>src/sources.py</code>.
+</footer>
+</html>

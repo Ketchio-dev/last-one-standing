@@ -1,0 +1,199 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Last One Standing — how many medicines in Canada have one supplier left</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<!--
+  템플릿. **분석 수치가 하나도 없다.** src/export_web.py 가 주입해 index.html 을 만든다.
+  검사(src/check.py)가 이 파일에 손으로 적은 소수가 남아 있으면 실패한다.
+-->
+<style>
+ :root{--ink:#111;--paper:#fff;--muted:#6b7280;--line:#e5e7eb;--bad:#b91c1c;--good:#15803d;--warn:#b45309;--band:#94a3b8}
+ *{box-sizing:border-box}
+ body{margin:0;font:15px/1.55 ui-sans-serif,system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;color:var(--ink);background:var(--paper)}
+ main{max-width:1000px;margin:0 auto;padding:28px 18px 80px}
+ h1{font-size:28px;line-height:1.2;letter-spacing:-.4px;margin:0 0 4px}
+ .sub{color:var(--muted);margin:0 0 20px}
+ .card{border:1px solid var(--line);border-radius:12px;padding:18px;margin:16px 0}
+ label{display:block;font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:5px}
+ input[type=search],select{font:inherit;padding:7px 10px;border:1px solid var(--line);border-radius:8px;width:100%}
+ .ctrls{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;align-items:end}
+ .toggles{display:flex;flex-wrap:wrap;gap:14px;margin-top:14px;font-size:14px}
+ .toggles label{display:flex;gap:6px;align-items:center;text-transform:none;letter-spacing:0;font-size:14px;color:var(--ink);margin:0;cursor:pointer}
+ .delta{color:var(--warn);font-variant-numeric:tabular-nums}
+ table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums;font-size:14px}
+ th,td{text-align:right;padding:5px 8px;border-bottom:1px solid var(--line)}
+ th:first-child,td:first-child,th:nth-child(2),td:nth-child(2){text-align:left}
+ th{color:var(--muted);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:1px}
+ tbody tr{cursor:pointer}
+ tbody tr:hover td{background:#f8fafc}
+ tr.sel td{background:#eef2ff}
+ .big{font-size:40px;font-weight:800;letter-spacing:-1px;line-height:1}
+ .against{border-left:4px solid var(--warn);background:#fffbeb;padding:12px 15px;border-radius:0 8px 8px 0;margin:8px 0;font-size:14px}
+ .against b{color:var(--warn)}
+ footer{color:var(--muted);font-size:12.5px;margin-top:30px;border-top:1px solid var(--line);padding-top:14px}
+ code{background:#f3f4f6;padding:1px 5px;border-radius:4px;font-size:12.5px}
+ .muted{color:var(--muted)}
+ polyline.band{fill:none;stroke:var(--band);stroke-width:2.5}
+ .log{font-size:13px;color:var(--muted);margin-top:10px;white-space:pre-line}
+</style>
+<main>
+ <h1>Some medicines have one company left standing behind them.</h1>
+ <p class="sub" id="lede"></p>
+
+ <div class="card">
+  <div class="ctrls">
+   <div><label for="q">search a medicine</label><input id="q" type="search" placeholder="lovastatin, desipramine, a brand name…"></div>
+   <div><label for="sort">rank by</label><select id="sort">
+     <option value="lost">companies lost</option>
+     <option value="few">fewest suppliers now</option>
+     <option value="old">oldest</option>
+   </select></div>
+  </div>
+  <div class="toggles">
+   <label><input type="checkbox" id="rx" checked> prescription only <span class="delta" id="d-rx"></span></label>
+   <label><input type="checkbox" id="nopat" checked> no unexpired listed patent <span class="delta" id="d-nopat"></span></label>
+   <label><input type="checkbox" id="thin" checked> once had more than one <span class="delta" id="d-thin"></span></label>
+   <label><input type="checkbox" id="merge"> merge parent companies <span class="delta" id="d-merge"></span></label>
+  </div>
+  <div class="log" id="log"></div>
+ </div>
+
+ <div class="card">
+  <div id="count"></div>
+  <table><thead><tr>
+    <th>molecule</th><th>sold as</th><th>first</th><th>ever</th><th>now</th><th>lost</th>
+  </tr></thead><tbody id="rows"></tbody></table>
+  <div class="muted" id="more"></div>
+ </div>
+
+ <div class="card" id="detail"></div>
+
+ <div class="card">
+  <label>does supplier count predict the medicine disappearing?</label>
+  <div id="cohorts"></div>
+ </div>
+
+ <div id="against"></div>
+ <footer id="prov"></footer>
+</main>
+
+<script>
+/*DATA_START*/
+const DATA = null;
+/*DATA_END*/
+
+const $ = (id) => document.getElementById(id);
+const R = DATA.rows, Y = DATA.years;
+let sel = null;
+
+// 계열사 병합 근사: 정규화된 이름의 **첫 두 낱말**이 같으면 한 회사로 본다.
+// 이건 근사이고, 화면이 그렇게 말한다. 그리고 병합은 단일공급을 **늘릴 수만** 있다.
+const root = (c) => c.split(" ").slice(0, 2).join(" ");
+const nowCount = (r) => ($("merge").checked ? new Set(r.c.map(root)).size : r.n);
+
+function base() { return R.filter((r) => nowCount(r) === 1); }
+function pass(r, skip) {
+  if (nowCount(r) !== 1) return false;
+  if (skip !== "rx" && $("rx").checked && !r.rx) return false;
+  if (skip !== "nopat" && $("nopat").checked && r.p) return false;
+  if (skip !== "thin" && $("thin").checked && r.e <= r.n) return false;
+  return true;
+}
+const selected = () => R.filter((r) => pass(r));
+
+function render() {
+  const q = $("q").value.trim().toUpperCase();
+  let rows = selected();
+  if (q) rows = rows.filter((r) => r.m.includes(q) || r.b.some((b) => b.toUpperCase().includes(q)));
+  const by = $("sort").value;
+  rows.sort(by === "few" ? (a, b) => a.n - b.n || b.e - a.e
+          : by === "old" ? (a, b) => (a.f || "9999").localeCompare(b.f || "9999")
+          : (a, b) => (b.e - b.n) - (a.e - a.n));
+
+  const nfmt = (n) => Number(n).toLocaleString("en-CA");   // 문서와 같은 표기
+  $("count").innerHTML = `<span class="big">${nfmt(rows.length)}</span> molecules match — `
+    + `out of ${nfmt(base().length)} with a single supplier, out of ${nfmt(R.length)} marketed.`;
+  $("rows").innerHTML = rows.slice(0, 40).map((r, i) =>
+    `<tr data-i="${R.indexOf(r)}" class="${sel === R.indexOf(r) ? "sel" : ""}">`
+    + `<td>${r.m.toLowerCase()}</td><td class="muted">${(r.b[0] || "").toLowerCase()}</td>`
+    + `<td>${r.f || "—"}</td><td>${r.e}</td><td>${nowCount(r)}</td>`
+    + `<td>${r.e - nowCount(r) > 0 ? "−" + (r.e - nowCount(r)) : "—"}</td></tr>`).join("");
+  $("more").textContent = rows.length > 40 ? `…and ${rows.length - 40} more. Search to narrow.` : "";
+  [...$("rows").children].forEach((tr) =>
+    tr.addEventListener("click", () => { sel = Number(tr.dataset.i); render(); detail(); }));
+
+  // 토글을 끄면 수가 **얼마나** 달라지는지 그 자리에 찍는다.
+  // caveat 를 문장으로 적어 두는 것과, 사용자가 직접 눌러 보는 것은 다른 일이다.
+  for (const k of ["rx", "nopat", "thin"]) {
+    const off = R.filter((r) => pass(r, k)).length;
+    $("d-" + k).textContent = off === rows.length && !q ? "" : `(off: ${off})`;
+  }
+  const other = !$("merge").checked;
+  $("merge").checked = other;                       // 잠깐 뒤집어 반대편 수를 센다
+  const alt = R.filter((r) => pass(r)).length;
+  $("merge").checked = !other;
+  $("d-merge").textContent = `(${alt === selected().length ? "changes nothing" : "other way: " + alt})`;
+  $("log").textContent =
+    `What we did to try to break this: turned each filter off and printed the count beside it. `
+    + `Merging parent companies is an approximation — first two words of the normalised name — `
+    + `and it can only raise the single-supplier count, never lower it.`;
+  if (sel !== null) detail();
+}
+
+function detail() {
+  if (sel === null) { $("detail").innerHTML = `<span class="muted">Pick a row to see how it thinned.</span>`; return; }
+  const r = R[sel], w = 900, h = 150, pad = 34;
+  const max = Math.max(...r.y, 1);
+  const x = (i) => pad + i * (w - pad * 2) / (Y.length - 1);
+  const pts = r.y.map((v, i) => `${x(i)},${h - pad - (v / max) * (h - pad * 2)}`).join(" ");
+  const ticks = Y.map((y, i) => (y % 10 === 0 ? `<text x="${x(i)}" y="${h - 8}" font-size="11" fill="#6b7280" text-anchor="middle">${y}</text>` : "")).join("");
+  const band = DATA.cohorts["2016"];
+  const key = r.e >= 6 ? "6+" : r.e >= 3 ? "3-5" : String(r.e);
+  const c = band[key];
+  $("detail").innerHTML =
+    `<label>${r.m.toLowerCase()}</label>`
+  + `<div style="font-size:19px;margin-bottom:6px">${r.e} ${r.e === 1 ? "company has" : "companies have"} held it. `
+  + `<b>${nowCount(r)} ${nowCount(r) === 1 ? "does" : "do"} today.</b> `
+  + `<span class="muted">${r.c.slice(0, 3).join(", ").toLowerCase()}</span></div>`
+  + `<svg viewBox="0 0 ${w} ${h}" style="width:100%;height:auto">`
+  + `<polyline class="band" points="${pts}"/>`
+  + `<text x="${pad}" y="16" font-size="12" fill="#6b7280">companies holding an authorisation (peak ${max})</text>`
+  + ticks + `</svg>`
+  + `<div class="muted" style="margin-top:6px">First marketed ${r.f || "unknown"} · `
+  + `${r.rx ? "prescription" : "non-prescription"} · `
+  + `${r.p ? "has an unexpired listed patent" : r.L ? "listed patents, all expired" : "never on the Patent Register"}</div>`
+  + (c ? `<div class="muted" style="margin-top:6px">Molecules in its band (${key} suppliers in 2016): `
+       + `${c.gone} of ${c.n} are no longer marketed.</div>` : "");
+}
+
+function cohorts() {
+  const bands = ["1", "2", "3-5", "6+"];
+  let t = `<table><thead><tr><th>cohort</th>` + bands.map((b) => `<th>${b} supplier${b === "1" ? "" : "s"}</th>`).join("") + `</tr></thead><tbody>`;
+  for (const [yr, agg] of Object.entries(DATA.cohorts)) {
+    t += `<tr><td><b>${yr}</b></td>` + bands.map((b) => {
+      const c = agg[b];
+      return c ? `<td>${(c.gone * 100 / c.n).toFixed(1)} % <span class="muted">(n=${c.n})</span></td>` : `<td>—</td>`;
+    }).join("") + `</tr>`;
+  }
+  $("cohorts").innerHTML = t + `</tbody></table>`
+    + `<div class="muted" style="margin-top:8px">Of the molecules marketed in that year, the share no longer marketed in ${DATA.today.slice(0, 4)}. `
+    + `${DATA.dark_total} molecules once marketed in Canada are not any more — they are the other half of this sample. `
+    + `Bands are coarse because the finer ones wobble where the sample is smallest; <code>src/report.py</code> prints those inversions by name.</div>`;
+}
+
+$("lede").textContent =
+  `${Number(DATA.rows.length).toLocaleString("en-CA")} molecules are marketed in Canada today. The count with one supplier is already published by the regulator — `
+  + `what is measured here is whether that count predicts the medicine disappearing.`;
+$("against").innerHTML = Object.entries(DATA.against)
+  .map(([k, v]) => `<div class="against"><b>${k === "shortage" ? "This does not mean you will run out." : k === "published" ? "The count is not our finding." : k === "patent" ? "“No listed patent” is not “off patent”." : "The holder is not the plant."}</b><br>${v}</div>`).join("");
+const pv = DATA.provenance;
+$("prov").innerHTML =
+  `Sources, all keyless: Health Canada Drug Product Database and the Patent Register. `
+  + Object.entries(pv).map(([n, s]) => `<code>${n}</code> ${(s.bytes / 1048576).toFixed(1)} MB`).join(" · ")
+  + `. Patent Register <b>Last-Modified ${pv.patent_zip ? pv.patent_zip.last_modified : "unknown"}</b> — that is the patent cut-off date of this whole page, not the day it was fetched. `
+  + `${DATA.patent_register.dins_with_expiry} DINs carry an expiry. `
+  + `Every number here was written by <code>src/export_web.py</code> from script output; none typed by hand.`;
+
+["q", "sort", "rx", "nopat", "thin", "merge"].forEach((id) => $(id).addEventListener("input", render));
+render(); cohorts(); detail();
+</script>
